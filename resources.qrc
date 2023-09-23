@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="cover">
+    <file>book-cover-no.svg</file>
+  </qresource>
+</RCC>
