@@ -7,7 +7,8 @@ from qfluentwidgets import Dialog, InfoBarIcon, InfoBar,InfoBarPosition
 from requests.exceptions import RequestException
 import Ui_biligui,requests
 from bs4 import BeautifulSoup
-headers = {'User-Agent': 'Mozilla/5.0', 'referer': 'https://w.linovelib.com/'}
+URL = "https://www.bilinovel.com"
+headers = {'User-Agent': 'Mozilla/5.0', 'referer': URL}
 flag=0
 max_retries=10
 path="C:/Users/WYC20/OneDrive - swartart/1-books/"
@@ -424,8 +425,8 @@ class main(QWidget):
                 flag=1
         else:
             self.createInfoBar("已存在",img_url)
-    def extract(self,soup,dir):
-        acontent_div = soup.find("div", {"id": "acontent"})
+    def extract(self,soup,dir):#提取章节内容
+        acontent_div = soup.find("div", {"id": "acontentz"})
         for img_tag in acontent_div.find_all("img"):
             try:
                 img_url = img_tag["data-src"]
@@ -457,13 +458,13 @@ class main(QWidget):
         if mode==1:
             if match and compare_urls(url.split("/")[-1],match.group(1).split("/")[-1]):
                 #print("下一页："+match.group(1))
-                return content+"\n"+self.get_chapter("https://w.linovelib.com"+match.group(1),dir)
+                return content+"\n"+self.get_chapter(URL+match.group(1),dir)
             else:
                 return content
         else:
             if match and compare_urls(url.split("/")[-1],match.group(1).split("/")[-1]):
                 #print("下一页："+match.group(1))
-                return self.get_chapter("https://w.linovelib.com"+match.group(1),dir,2)
+                return self.get_chapter(URL+match.group(1),dir,2)
             else:
                 return match.group(1)
     def get_book(self,soup,start,title,seriesdir,id,introduction,stitle,author,path):
@@ -503,14 +504,14 @@ class main(QWidget):
                 href = link['href']
                 self.createInfoBar("正在下载",li_tag.text.strip())
                 print(title,href, li_tag.text.strip())
-                if str(href)=="javascript:cid(0)":
+                if str(href)=="javascript:cid(1)":
                     self.createWarningInfoBar("错误，回溯中","")
                     print("\r错误，回溯中")
                     try:
-                        href=self.get_chapter("https://w.linovelib.com"+soup.find_all('li')[start-1].find('a')['href'],dir,2)
+                        href=self.get_chapter(URL+"/"+soup.find_all('li')[start-1].find('a')['href'],dir,2)
                     except:
-                        href=self.get_chapter("https://w.linovelib.com"+soup.find_all('li')[start-2].find('a')['href'],dir,2)
-                content=self.get_chapter("https://w.linovelib.com"+href,dir)
+                        href=self.get_chapter(URL+"/"+soup.find_all('li')[start-2].find('a')['href'],dir,2)
+                content=self.get_chapter(URL+href,dir)
                 self.process+=1
                 print(self.process,self.all,(self.process/self.all)*100)
                 self.ui.ProgressBar.setValue(int((self.process/self.all)*100))#int(self.process/self.all)
@@ -535,7 +536,7 @@ class main(QWidget):
     def get(self):
         print("get")
         idnum=self.ui.seriesnum.text()
-        url = "https://w.linovelib.com/novel/"+idnum+".html"
+        url = URL+"/novel/"+idnum+".html"
         self.ui.get.setDisabled(True)
         self.ui.seriesnum.setEnabled(False)
         self.ui.Start.setEnabled(False)
